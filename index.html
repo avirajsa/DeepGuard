@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DeepGuard — Conceptual AI Deepfake Detection Interface</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #080b10;
+  --bg2: #0e1219;
+  --bg3: #141820;
+
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+
+  --text: #e8eaf0;
+  --muted: #7a8090;
+
+  --accent: #00e5b0;
+  --accent2: #0099ff;
+
+  --danger: #ff4757;
+  --warn: #ffa502;
+  --safe: #2ed573;
+
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,229,176,0.012) 2px,
+      rgba(0,229,176,0.012) 4px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NAV */
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 60px;
+  padding: 0 2rem;
+
+  background: rgba(8,11,16,0.88);
+  backdrop-filter: blur(14px);
+
+  border-bottom: 0.5px solid var(--border);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--text);
+  text-decoration: none;
+
+  font-family: var(--font-head);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.logo-icon {
+  width: 28px;
+  height: 28px;
+
+  border-radius: 6px;
+
+  background: var(--accent);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #080b10;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.nav-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+
+  color: var(--accent);
+
+  border: 0.5px solid rgba(0,229,176,0.35);
+
+  padding: 3px 10px;
+  border-radius: 20px;
+
+  letter-spacing: 0.05em;
+
+  background: rgba(0,229,176,0.06);
+}
+
+.nav-right {
+  display: flex;
+  gap: 1.4rem;
+}
+
+.nav-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color .2s;
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+/* HERO */
+
+.hero {
+  position: relative;
+  text-align: center;
+  padding: 5rem 2rem 3rem;
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 650px;
+  height: 320px;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(0,229,176,0.08) 0%,
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+.hero-tag {
+  display: inline-block;
+
+  margin-bottom: 1.4rem;
+
+  padding: 4px 12px;
+
+  border-radius: 20px;
+
+  border: 0.5px solid rgba(0,229,176,0.28);
+
+  background: rgba(0,229,176,0.05);
+
+  color: var(--accent);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.07em;
+}
+
+h1 {
+  font-family: var(--font-head);
+  font-size: clamp(2.7rem, 6vw, 4.6rem);
+  font-weight: 800;
+  line-height: 1;
+
+  letter-spacing: -0.04em;
+
+  margin-bottom: 1rem;
+
+  color: white;
+}
+
+h1 span {
+  color: var(--accent);
+}
+
+.hero-sub {
+  max-width: 600px;
+  margin: 0 auto 1.6rem;
+
+  color: var(--muted);
+
+  line-height: 1.7;
+  font-size: 1rem;
+  font-weight: 300;
+}
+
+.concept-note {
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  padding: 14px 18px;
+
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.03);
+
+  color: #9aa3b2;
+
+  line-height: 1.7;
+  font-size: 13px;
+  font-weight: 300;
+
+  backdrop-filter: blur(8px);
+}
+
+/* STATS */
+
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+
+  padding: 1.6rem 0 2rem;
+
+  margin: 0 2rem 3rem;
+
+  border-top: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+
+  flex-wrap: wrap;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-n {
+  font-family: var(--font-head);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.stat-n span {
+  color: var(--accent);
+}
+
+.stat-l {
+  margin-top: 3px;
+
+  color: var(--muted);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+/* MAIN */
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* PANEL */
+
+.panel {
+  background: var(--bg2);
+
+  border: 0.5px solid var(--border);
+
+  border-radius: 12px;
+
+  overflow: hidden;
+}
+
+.panel-full {
+  grid-column: 1 / -1;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 1rem 1.2rem .8rem;
+
+  border-bottom: 0.5px solid var(--border);
+}
+
+.panel-icon {
+  width: 28px;
+  height: 28px;
+
+  border-radius: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+}
+
+.pi-teal {
+  background: rgba(0,229,176,0.12);
+  color: var(--accent);
+}
+
+.pi-blue {
+  background: rgba(0,153,255,0.12);
+  color: var(--accent2);
+}
+
+.pi-red {
+  background: rgba(255,71,87,0.12);
+  color: var(--danger);
+}
+
+.panel-title {
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.panel-subtitle {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.panel-body {
+  padding: 1.25rem;
+}
+
+/* PLACEHOLDER */
+
+.placeholder-msg {
+  text-align: center;
+  padding: 2rem 1rem;
+
+  color: var(--muted);
+
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.placeholder-msg .big {
+  font-size: 2rem;
+  opacity: 0.3;
+  margin-bottom: .6rem;
+}
+
+/* UPLOAD */
+
+.upload-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: 10px;
+
+  padding: 2.5rem 1rem;
+
+  text-align: center;
+
+  transition: .2s;
+
+  cursor: pointer;
+}
+
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: rgba(0,229,176,0.04);
+}
+
+.upload-title {
+  color: white;
+  margin-bottom: 5px;
+  font-size: 15px;
+}
+
+.upload-hint {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+.upload-icon {
+  font-size: 2rem;
+  margin-bottom: .8rem;
+}
+
+/* TABS */
+
+.type-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+
+.type-tab {
+  flex: 1;
+
+  border: 0.5px solid var(--border);
+
+  border-radius: 7px;
+
+  padding: 7px 0;
+
+  background: transparent;
+
+  color: var(--muted);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+.type-tab.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(0,229,176,0.08);
+}
+
+/* BUTTON */
+
+.analyze-btn {
+  width: 100%;
+  margin-top: 1rem;
+
+  border: none;
+  border-radius: 8px;
+
+  padding: 13px;
+
+  background: var(--accent);
+
+  color: #080b10;
+
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition: opacity .2s;
+}
+
+.analyze-btn:hover {
+  opacity: .9;
+}
+
+/* TERMINAL */
+
+.terminal {
+  margin-top: .5rem;
+
+  background: #04060a;
+
+  border: 0.5px solid var(--border);
+
+  border-radius: 8px;
+
+  padding: 1rem;
+
+  max-height: 150px;
+  overflow-y: auto;
+
+  line-height: 1.7;
+
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.log-line {
+  display: block;
+}
+
+.log-ts {
+  color: var(--muted);
+}
+
+.log-info {
+  color: var(--accent2);
+}
+
+.log-ok {
+  color: var(--accent);
+}
+
+/* RESULT */
+
+.result-wrap {
+  text-align: center;
+}
+
+.result-score {
+  font-family: var(--font-head);
+  font-size: 4rem;
+  font-weight: 800;
+
+  margin-bottom: .4rem;
+}
+
+.result-label {
+  display: inline-block;
+
+  border-radius: 20px;
+
+  padding: 6px 14px;
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.fake {
+  color: var(--danger);
+  background: rgba(255,71,87,0.12);
+}
+
+.real {
+  color: var(--safe);
+  background: rgba(46,213,115,0.12);
+}
+
+.warn {
+  color: var(--warn);
+  background: rgba(255,165,2,0.12);
+}
+
+/* FOOTER */
+
+footer {
+  border-top: 0.5px solid rgba(255,255,255,0.06);
+
+  padding: 18px 24px;
+
+  text-align: center;
+
+  color: #6f7787;
+
+  font-size: 12px;
+
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 760px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-full {
+    grid-column: 1;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">DG</div>
+    DeepGuard
+  </a>
+
+  <span class="nav-badge">◆ CONCEPT EXPERIENCE</span>
+
+  <div class="nav-right">
+    <a href="#" class="nav-link">Overview</a>
+    <a href="#" class="nav-link">Research</a>
+    <a href="#" class="nav-link">Concept</a>
+  </div>
+</nav>
+
+<div class="hero">
+
+  <div class="hero-glow"></div>
+
+  <div class="hero-tag">
+    Speculative AI Forensics Interface · Concept Demonstration
+  </div>
+
+  <h1>
+    Detect <span>deepfakes</span><br>
+    in every pixel.
+  </h1>
+
+  <p class="hero-sub">
+    A conceptual interface exploring explainable multi-modal AI forensics
+    for synthetic media analysis across image, video, and audio systems.
+  </p>
+
+  <div class="concept-note">
+    DeepGuard is a speculative interface concept created for demonstration and design exploration purposes.
+    The current experience simulates AI-assisted forensic workflows, confidence scoring,
+    and visualization systems to illustrate a possible future implementation of
+    multi-modal deepfake analysis technology. It is not connected to a live detection backend
+    and should not be interpreted as a functional forensic verification platform.
+  </div>
+
+</div>
+
+<div class="stats-row">
+
+  <div class="stat">
+    <div class="stat-n"><span>96.3</span>%</div>
+    <div class="stat-l">Image Accuracy</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-n"><span>94.1</span>%</div>
+    <div class="stat-l">Video Accuracy</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-n"><span>91.7</span>%</div>
+    <div class="stat-l">Audio Accuracy</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-n">&lt;<span>2</span>s</div>
+    <div class="stat-l">Avg. Latency</div>
+  </div>
+
+</div>
+
+<div class="main">
+
+  <!-- LEFT -->
+
+  <div class="panel">
+
+    <div class="panel-header">
+      <div class="panel-icon pi-teal">⬆</div>
+
+      <div>
+        <div class="panel-title">Upload Media</div>
+        <div class="panel-subtitle">Image · Video · Audio</div>
+      </div>
+    </div>
+
+    <div class="panel-body">
+
+      <div class="type-tabs">
+        <button class="type-tab active">🖼 Image</button>
+        <button class="type-tab">🎥 Video</button>
+        <button class="type-tab">🎵 Audio</button>
+      </div>
+
+      <div class="upload-zone">
+        <div class="upload-icon">📂</div>
+
+        <div class="upload-title">
+          Drop file here or click to browse
+        </div>
+
+        <div class="upload-hint">
+          Simulated upload interface · no real analysis performed
+        </div>
+      </div>
+
+      <button class="analyze-btn" id="analyze-btn">
+        ▶ RUN CONCEPTUAL ANALYSIS
+      </button>
+
+      <div style="margin-top:1rem;">
+        <div style="
+          margin-bottom:6px;
+          color:var(--muted);
+          font-size:11px;
+          font-family:var(--font-mono);
+        ">
+          SYSTEM LOG
+        </div>
+
+        <div class="terminal" id="terminal">
+          <span class="log-line">
+            <span class="log-ts">[00:00]</span>
+            <span class="log-info">DeepGuard Concept UI initialized</span>
+          </span>
+
+          <span class="log-line">
+            <span class="log-ts">[00:00]</span>
+            <span class="log-ok">Visualization modules loaded</span>
+          </span>
+
+          <span class="log-line">
+            <span class="log-ts">[00:00]</span>
+            <span class="log-info">Awaiting simulated analysis…</span>
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+
+  <div class="panel">
+
+    <div class="panel-header">
+      <div class="panel-icon pi-red">🔍</div>
+
+      <div>
+        <div class="panel-title">Detection Results</div>
+        <div class="panel-subtitle">Simulated conceptual output</div>
+      </div>
+    </div>
+
+    <div class="panel-body">
+
+      <div class="result-wrap">
+
+        <div class="result-score" id="score">
+          —
+        </div>
+
+        <div class="result-label warn" id="label">
+          Awaiting simulation
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HEATMAP -->
+
+  <div class="panel">
+
+    <div class="panel-header">
+      <div class="panel-icon pi-blue">🗺</div>
+
+      <div>
+        <div class="panel-title">Grad-CAM Heatmap</div>
+        <div class="panel-subtitle">Illustrative visualization</div>
+      </div>
+    </div>
+
+    <div class="panel-body">
+
+      <div class="placeholder-msg">
+        <div class="big">📡</div>
+        Simulated manipulation regions<br>
+        appear after conceptual analysis.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SIGNALS -->
+
+  <div class="panel">
+
+    <div class="panel-header">
+      <div class="panel-icon pi-teal">⚡</div>
+
+      <div>
+        <div class="panel-title">Forensic Signals</div>
+        <div class="panel-subtitle">Synthetic demonstration metrics</div>
+      </div>
+    </div>
+
+    <div class="panel-body">
+
+      <div class="placeholder-msg">
+        <div class="big">📊</div>
+        AI-generated signal breakdowns<br>
+        displayed for interface demonstration.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+
+  <div class="panel panel-full">
+
+    <div class="panel-header">
+      <div class="panel-icon pi-blue">🤖</div>
+
+      <div>
+        <div class="panel-title">AI Forensic Summary</div>
+        <div class="panel-subtitle">Narrative simulation layer</div>
+      </div>
+    </div>
+
+    <div class="panel-body">
+
+      <div class="placeholder-msg">
+        <div class="big">💬</div>
+
+        This section demonstrates how an explainable AI forensic
+        assistant might summarize synthetic media findings
+        within a future production system.
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  DeepGuard Concept Interface · Simulated analytical outputs ·
+  Non-production demonstration experience
+</footer>
+
+<script>
+const analyzeBtn = document.getElementById('analyze-btn');
+const terminal = document.getElementById('terminal');
+
+const score = document.getElementById('score');
+const label = document.getElementById('label');
+
+function log(message, cls='log-info') {
+  const line = document.createElement('span');
+
+  line.className = 'log-line';
+
+  line.innerHTML = `
+    <span class="log-ts">
+      [${new Date().toLocaleTimeString('en-US', {
+        hour:'2-digit',
+        minute:'2-digit',
+        second:'2-digit',
+        hour12:false
+      })}]
+    </span>
+    <span class="${cls}">${message}</span>
+  `;
+
+  terminal.appendChild(line);
+
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+analyzeBtn.addEventListener('click', async () => {
+
+  log('Initializing conceptual analysis pipeline…');
+  await sleep(700);
+
+  log('Generating simulated tensor outputs…');
+  await sleep(700);
+
+  log('Synthesizing illustrative forensic signals…');
+  await sleep(700);
+
+  const scenarios = [
+    {
+      score: 92,
+      label: 'DEEPFAKE DETECTED',
+      class: 'fake'
+    },
+    {
+      score: 61,
+      label: 'SUSPICIOUS PATTERNS',
+      class: 'warn'
+    },
+    {
+      score: 27,
+      label: 'LIKELY AUTHENTIC',
+      class: 'real'
+    }
+  ];
+
+  const selected =
+    scenarios[Math.floor(Math.random() * scenarios.length)];
+
+  score.textContent = selected.score + '%';
+
+  label.textContent = selected.label;
+
+  label.className = 'result-label ' + selected.class;
+
+  log('Conceptual analysis complete.', 'log-ok');
+});
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+</script>
+
+</body>
+</html>
