@@ -148,7 +148,7 @@ curl -X POST https://api.deepguard.ai/detect \
 | | |
 |---|---|
 | 🌐 Live Demo | https://SoumalyaSaha.github.io/DeepGuard |
-| 💻 GitHub |  |
+| 💻 GitHub | https://github.com/SoumalyaSaha/DeepGuard  |
 | 📧 Contact | soumalyasaha145@gmail.com |
 
 
