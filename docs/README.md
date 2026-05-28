@@ -106,7 +106,7 @@ Infrastructure AWS S3 · Hugging Face Hub · CI/CD Pipeline
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-team/deepguard.git
+git clone https://github.com/SoumalyaSaha/DeepGuard.git
 cd deepguard
 
 # Install backend dependencies
